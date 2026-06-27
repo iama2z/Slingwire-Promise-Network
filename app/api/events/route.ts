@@ -10,7 +10,17 @@ function asString(value: FormDataEntryValue | null): string {
 }
 
 function isValidHandle(handle: string): boolean {
-  return /^@?[a-z0-9._-]+(?:\.[a-z0-9._-]+)*$/i.test(handle);
+  const normalized = handle.startsWith("@") ? handle.slice(1) : handle;
+  if (!normalized || normalized.length > MAX_HANDLE_LENGTH) {
+    return false;
+  }
+
+  const parts = normalized.split(".");
+  if (parts.some((part) => part.length === 0)) {
+    return false;
+  }
+
+  return parts.every((part) => /^[a-z0-9_-]+$/i.test(part));
 }
 
 /**
