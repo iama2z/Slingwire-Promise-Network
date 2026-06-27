@@ -15,11 +15,12 @@ function escapeXml(input: string): string {
 }
 
 /**
- * Serve an RSS 2.0 document built dynamically from Wichita events in Firestore.
+ * Serve an RSS 2.0 document built dynamically from Wichita events in Firestore/demo storage.
  */
-export async function GET() {
+export async function GET(request: Request) {
   const events = await getWichitaEvents(100);
   const buildDate = new Date().toUTCString();
+  const origin = new URL(request.url).origin;
 
   const items = events
     .map((event) => {
@@ -34,6 +35,7 @@ export async function GET() {
           <description>${description}</description>
           <author>${escapeXml(event.authorHandle)}</author>
           <guid isPermaLink="false">${escapeXml(guid)}</guid>
+          <link>${origin}/</link>
           <pubDate>${pubDate}</pubDate>
         </item>`;
     })
@@ -43,7 +45,7 @@ export async function GET() {
 <rss version="2.0">
   <channel>
     <title>Slingwire Promise Network - Wichita Events</title>
-    <link>https://example.com/</link>
+    <link>${origin}/</link>
     <description>Open, zero-tracking local events feed for Wichita.</description>
     <language>en-us</language>
     <lastBuildDate>${buildDate}</lastBuildDate>
